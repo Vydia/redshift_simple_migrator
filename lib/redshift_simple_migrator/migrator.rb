@@ -38,7 +38,7 @@ module RedshiftSimpleMigrator
       if direction == :up
         migrations = current_migrations.select do |m|
           include_target = target_version ? target_version.to_i >= m.version : true
-          include_target && ! all_migrated_versions.include?(m.version)
+          include_target && !all_migrated_versions.include?(m.version)
         end
         return direction, migrations.sort_by(&:version)
       else
