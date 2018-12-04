@@ -2,7 +2,7 @@ require 'active_support/inflector'
 
 module RedshiftSimpleMigrator
   class Migrator
-    attr_reader :connection, :migrations_path, :schema_migrations_table_name
+    attr_reader :connection, :migrations_path, :schema_migrations_table_name, :schema_migrations_schema_name
 
     delegate :close, to: :connection
 
@@ -14,7 +14,8 @@ module RedshiftSimpleMigrator
       @migrations_path = config.migrations_path
       @schema_migrations_table_name =
         @connection.quote_ident(config.schema_migrations_table_name)
-
+      @schema_migrations_schema_name =
+        @connection.quote_ident(config.schema_migrations_schema_name)
       @current_version_is_loaded = nil
       @current_migrations = nil
       @all_migrated_versions_is_loaded = nil
@@ -99,11 +100,11 @@ module RedshiftSimpleMigrator
     private
 
     def get_version_query
-      "SELECT version FROM #{schema_migrations_table_name}"
+      "SELECT version FROM #{schema_migrations_schema_name}.#{schema_migrations_table_name}"
     end
 
     def create_schema_migrations_table_query
-      "CREATE TABLE IF NOT EXISTS #{schema_migrations_table_name} (version text NOT NULL)"
+      "CREATE TABLE IF NOT EXISTS #{schema_migrations_schema_name}.#{schema_migrations_table_name} (version text NOT NULL)"
     end
 
     def detect_direction(target_version)
@@ -118,13 +119,13 @@ module RedshiftSimpleMigrator
 
     def insert_version(version)
       connection.exec_params(<<-SQL, [version.to_s])
-      INSERT INTO #{schema_migrations_table_name} (version) VALUES ($1)
+      INSERT INTO #{schema_migrations_schema_name}.#{schema_migrations_table_name} (version) VALUES ($1)
       SQL
     end
 
     def remove_version(version)
       connection.exec_params(<<-SQL, [version.to_s])
-      DELETE FROM #{schema_migrations_table_name} WHERE version = $1
+      DELETE FROM #{schema_migrations_schema_name}.#{schema_migrations_table_name} WHERE version = $1
       SQL
     end
   end

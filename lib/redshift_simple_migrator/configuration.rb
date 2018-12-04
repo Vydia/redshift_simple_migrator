@@ -10,6 +10,10 @@ module RedshiftSimpleMigrator
       "schema_migrations"
     end
 
+    config_accessor :schema_migrations_schema_name do
+      "public"
+    end
+
     config_accessor :logger
 
     config_accessor :migrations_path
