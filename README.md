@@ -93,6 +93,7 @@ default: &default
   password: password
   connect_timeout: 30000
   schema_migrations_table_name: redshift_schema_migrations
+  schema_migrations_schema_name: public
 
 development:
   <<: *default
@@ -103,7 +104,7 @@ If `schema_migrations_table_name` table doesn't exist, this gem creates the tabl
 `schema_migrations` table schema is following.
 
 ```sql
-CREATE TABLE <schema_migrations_table_name> (version text NOT NULL)
+CREATE TABLE <schema_migrations_schema_name>.<schema_migrations_table_name> (version text NOT NULL)
 ```
 
 ## TODO
